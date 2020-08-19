@@ -101,6 +101,7 @@ export default {
           isSelected: this.isSelectedDate(dObj),
           isDisabled: this.isDisabledDate(dObj),
           isHighlighted: this.isHighlightedDate(dObj),
+          isAdditionalHighlighted: this.isAdditionalHighlightedDate(dObj),
           isHighlightStart: this.isHighlightStart(dObj),
           isHighlightEnd: this.isHighlightEnd(dObj),
           isToday: this.utils.compareDates(dObj, new Date()),
@@ -321,11 +322,39 @@ export default {
 
       return highlighted
     },
+    /**
+     * Whether a day is additional highlighted (only if it is not disabled already except when highlighted.includeDisabled is true)
+     * @param {Date}
+     * @return {Boolean}
+     */
+    isAdditionalHighlightedDate (date) {
+      if (!(this.highlighted && this.highlighted.includeDisabled) && this.isDisabledDate(date)) {
+        return false
+      }
+
+      let highlighted = false
+
+      if (typeof this.highlighted === 'undefined') {
+        return false
+      }
+
+      if (typeof this.highlighted.additional !== 'undefined') {
+        this.highlighted.additional.forEach((d) => {
+          if (this.utils.compareDates(date, d)) {
+            highlighted = true
+            return true
+          }
+        })
+      }
+
+      return highlighted
+    },
     dayClasses (day) {
       return {
         'selected': day.isSelected,
         'disabled': day.isDisabled,
         'highlighted': day.isHighlighted,
+        'additional-highlighted': day.isAdditionalHighlighted,
         'today': day.isToday,
         'weekend': day.isWeekend,
         'sat': day.isSaturday,
